@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-image: url("homebackground.png"); /* Replace with your image URL */
+      background-size: cover; /* Ensures the image covers the entire background */
+      background-repeat: no-repeat; /* Prevents the image from repeating */
+      background-position: center center; /* Centers the image */
+      background-attachment: fixed; /* Keeps the background fixed when scrolling */
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    body.no-interaction {
+      pointer-events: none; /* Disables all interactions */
+    }
+
+    .container {
+      text-align: center;
+      margin: auto;
+    }
+
+    h1 {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 3rem;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+
+    button:active {
+      background-color: #888;
+    }
+
+    /* Homesound button style */
+    .homesound-button {
+      position: absolute; /* Places it relative to the container */
+      top: 10px;          /* Adjust position from the top */
+      right: 10px;        /* Adjust position from the right */
+      width: 60px;        /* Adjust size to match overall UI */
+      height: 60px;
+      background-color: #19386e; /* Matches other button colors */
+      border-radius: 15px; /* Circular button */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 122, 255, 0.8); /* Subtle shadow */
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+    }
+
+    .homesound-button img {
+      width: 30px;       /* Icon size matches UI */
+      height: 30px;
+    }
+
+    .homesound-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 40px rgba(0, 122, 255, 1), 0 0 70px rgba(0, 122, 255, 0.8); /* Blue glow on hover */
+    }
+
+    .homesound-button:active {
+      transform: scale(0.9); /* Shrinks slightly on click */
+    }
+
+    #playerdetail {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 32, 0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    #playername {
+      background: #001;
+      padding: 30px;
+      border: 2px solid #00f;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #00f;
+      text-align: center;
+      position: relative;
+    }
+
+    #playername h2 {
+      border-top: 5px;
+      color: #00f;
+      margin-bottom: 20px;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 24px;
+    }
+
+    #startGame {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px; /* Rounded button */
+      background: linear-gradient(45deg, #6a11cb, #2575fc); /* Gradient background */
+      color: white;
+      font-family: 'Times New Roman', Times, serif;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover animations */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    }
+
+    #startGame:hover {
+      transform: scale(1.1); /* Slightly enlarges button on hover */
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Adds a more prominent shadow */
+    }
+
+    #startGame:active {
+      transform: scale(0.95); /* Button "press" effect */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect reduces */
+    }
+
+    #startGame:focus {
+      outline: none; /* Removes default focus outline */
+      box-shadow: 0 0 10px rgba(98, 0, 238, 0.5); /* Adds a glowing effect */
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .game-image {
+      width: 50%; /* Makes the image full width of the container */
+      height: 50%; /* Keeps the aspect ratio */
+      margin: 20px 0; /* Adds space around the image */
+      max-width: 600px; /* Optional: Limit the image width */
+      display: block; /* Ensures the image is displayed as a block element */
+      margin-left: auto;
+      margin-right: auto; /* Centers the image */
+      border-radius: 10px;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+
+    .player1 {
+      background-color: blue;
+      color: rgb(255, 255, 255);
+      margin: auto;
+      border-radius: 15px;
+      font-weight: bold;
+      padding: 5px 10px;
+    }
+
+    .player2 {
+      background-color: red;
+      color: rgb(255, 255, 255);
+      margin: auto;
+      border-radius: 15px;
+      font-weight: bold;
+      padding: 5px 10px;
+    }
+
+    .score {
+      background-color: white;
+      color: black;
+      margin: auto;
+      border-radius: 5px;
+      font-weight: bold;
+      padding: 5px 10px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+      margin-bottom: 20px;
+      background-color: white;
+      border: 5px solid; /* Border color will be updated dynamically */
+      border-radius: 10px;
+      transition: box-shadow 0.3s, border-color 0.3s; /* Smooth transition for glow */
+      overflow: hidden; /* Prevent glow from spreading outside */
+      position: relative; /* Ensure clipping works */
+    }
+
+    /* Glowing effect for each player's turn */
+    .board.x-turn {
+      border-color: red;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.7); /* Red glow for X */
+    }
+
+    .board.o-turn {
+      border-color: blue;
+      box-shadow: 0 0 20px rgba(0, 0, 255, 0.7); /* Blue glow for O */
+    }
+
+    .cell:hover:not(.occupied) {
+      box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.8); /* Glow for unoccupied cells */
+    }
+
+    .board.x-turn .cell:hover:not(.occupied) {
+      box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.8); /* Red glow for X's turn */
+    }
+
+    .board.o-turn .cell:hover:not(.occupied) {
+      box-shadow: 0 0 20px 10px rgba(0, 0, 255, 0.8); /* Blue glow for O's turn */
+    }
+
+    .cell.occupied {
+      cursor: not-allowed; /* Optionally change cursor for occupied cells */
+      box-shadow: none; /* Disable glow */
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Times New Roman', Times, serif;
+      border-radius: 5px;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      border: 2px solid #444;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .board.x-turn .cell:hover {
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.8); /* Red glow for X */
+    }
+
+    .board.o-turn .cell:hover {
+      box-shadow: 0 0 30px rgba(0, 0, 255, 0.8); /* Blue glow for O */
+    }
+
+    .winner {
+      color: limegreen;
+    }
+
+    /* Add this to your existing styles */
+    .splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh; /* Full height of the screen */
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      opacity: 1;
+      animation: fadeOut 10s forwards; /* Animates the splash to fade out */
+    }
+
+    .splash img {
+      width: 100%; /* Ensures the image covers the full width */
+      height: 100%; /* Ensures the image covers the full height */
+      object-fit: cover; /* Ensures the image scales while preserving its aspect ratio */
+      object-position: center center; /* Ensures the image is centered vertically and horizontally */
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    .loading-text {
+      position: absolute;
+      top: 85%; /* Position it 20% down from the top of the screen */
+      left: 50%; /* Center it horizontally */
+      transform: translateX(-50%); /* Adjust for perfect centering */
+      color: white;
+      font-size: 1.5rem;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+      animation: fadeOut 10s forwards; /* Matches the fade-out timing */
+    }
+
+    @keyframes ellipsis {
+      0% {
+        content: ".";
+      }
+      33% {
+        content: "..";
+      }
+      66% {
+        content: "...";
+      }
+    }
+
+    #dots {
+      animation: dots 1s infinite;
+    }
+
+    @keyframes dots {
+      0% {
+        content: "";
+      }
+      33% {
+        content: ".";
+      }
+      66% {
+        content: "..";
+      }
+      100% {
+        content: "...";
+      }
+    }
+
+    /* Back button styling */
+    #back-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    #back-button img {
+      width: 40px; /* Adjust the size of the arrow image */
+      height: auto; /* Maintain aspect ratio */
+      transition: transform 0.2s; /* Add a hover effect */
+    }
+
+    #back-button img:hover {
+      transform: scale(1.1); /* Slightly enlarge the image on hover */
+    }
+
+    /* Settings button style */
+    .settings-button {
+      position: absolute; /* Places it relative to the container */
+      top: 10px;          /* Adjust position from the top */
+      right: 10px;        /* Adjust position from the right */
+      width: 60px;        /* Adjust size to match overall UI */
+      height: 60px;
+      background-color: #19386e; /* Matches other button colors */
+      border-radius: 15px; /* Circular button */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 122, 255, 0.8); /* Subtle shadow */
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+    }
+
+    .settings-button img {
+      width: 30px;       /* Icon size matches UI */
+      height: 30px;
+    }
+
+    .settings-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 40px rgba(0, 122, 255, 1), 0 0 70px rgba(0, 122, 255, 0.8); /* Blue glow on hover */
+    }
+
+    .settings-button:active {
+      transform: scale(0.9); /* Shrinks slightly on click */
+    }
+
+    /* Pause Overlay */
+    #pause-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 32, 0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    #pause-menu {
+      background: #001;
+      padding: 30px;
+      border: 2px solid #00f;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #00f;
+      text-align: center;
+      position: relative;
+    }
+
+    #pause-menu h2 {
+      border-top: 5px;
+      color: #00f;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .pause-button {
+      width: 60px;
+      height: 60px;
+      margin: 10px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: box-shadow 0.3s;
+    }
+
+    .pause-button img {
+      width: 30px;
+    }
+
+    .pause-button:hover {
+      box-shadow: 0 0 20px #fff;
+    }
+
+    /* Button Colors */
+    #home-button {
+      background-color: #ff0000; /* Red */
+      box-shadow: 0 0 10px #ff0000;
+    }
+
+    #home-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 20px rgba(255, 0, 0, 1), 0 0 30px rgba(255, 0, 0, 0.8); /* Blue glow on hover */
+    }
+
+    #reset-button {
+      background-color: #00ff00; /* Green */
+      box-shadow: 0 0 10px #00ff00;
+    }
+
+    #reset-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 20px rgba(0, 255, 0, 1), 0 0 30px rgba(0, 255, 0, 0.8); /* Blue glow on hover */
+    }
+
+    #sound-button {
+      background-color: #0066ff; /* Blue */
+      box-shadow: 0 0 10px #0066ff;
+    }
+
+    #sound-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 20px rgba(0, 102, 255, 1), 0 0 30px rgba(0, 102, 255, 0.8); /* Blue glow on hover */
+    }
+
+    /* Close (Cross) Button */
+    #close-button {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      cursor: pointer;
+      background-color: #ff0000; /* Red */
+      box-shadow: 0 0 10px #ff0000;
+      border-radius: 50%;
+    }
+
+    /* Back button style */
+    .back-button {
+      position: absolute; /* Places it relative to the container */
+      top: 10px;          /* Adjust position from the top */
+      left: 10px;        /* Adjust position from the right */
+      width: 60px;        /* Adjust size to match overall UI */
+      height: 60px;
+      background-color: #19386e; /* Matches other button colors */
+      border-radius: 15px; /* Circular button */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 122, 255, 0.8); /* Subtle shadow */
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s ease-in-out; /* Smooth transitions */
+    }
+
+    .back-button img {
+      width: 30px;       /* Icon size matches UI */
+      height: 30px;
+    }
+
+    .back-button:hover {
+      transform: scale(1.1);           /* Slight zoom on hover */
+      box-shadow: 0 0 40px rgba(0, 122, 255, 1), 0 0 70px rgba(0, 122, 255, 0.8); /* Blue glow on hover */
+    }
+
+    .back-button:active {
+      transform: scale(0.9); /* Shrinks slightly on click */
+    }
+
+    #homepage {
+      display: none; /* Initially hide the homepage */
+    }
+
+    .cell {
+      transition: box-shadow 0.3s ease;
+    }
+
+    .board[data-player="X"] .cell:hover {
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.7); /* Red glow for X */
+    }
+
+    .board[data-player="O"] .cell:hover {
+      box-shadow: 0 0 10px rgba(0, 0, 255, 0.7); /* Blue glow for O */
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Add this at the very beginning of the <body> -->
+  <div class="splash" id="splash">
+    <img src="startingimage.png" alt="Splash Logo"> <!-- Replace with your splash image -->
+    <div class="loading-text" id="loading-text">Loading<span id="dots">...</span></div>
+  </div>    
+
+  <div class="container" id="homepage">
+    <div class="homesound-button" id="homesound-button">
+      <img id="homesound-image" src="speakeron-button.png" alt="Homesound">
+    </div>
+
+    <h1>Tic Tac Toe</h1>
+    <img src="Tic-Tac-Toe-Logo.png" alt="Game Image" class="game-image">
+    <div class="buttons">
+      <button id="pvpButton">Player vs Player</button>
+      <button onclick="alert('Player vs AI coming soon!')">Player vs AI</button>
+      <button onclick="exitGame()">Exit Game</button>
+    </div>
+  </div>
+
+  <div id="playerdetail">
+    <div id="playername">
+      <h2>Enter Player Name</h2>
+      <input type="text" id="player1Name" placeholder="Player 1">
+      <br><br>
+      <input type="text" id="player2Name" placeholder="Player 2">
+      <br><br>
+      <button id="startGame" onclick="startPlayerVsPlayer()">Start Game</button>
+    </div>
+  </div>
+
+
+  <div class="container hidden" id="gamepage">
+    <div class="back-button" id="back-button" onclick="navigateBack()">
+      <img src="back-button.png" alt="Back Arrow" />
+    </div>  
+
+    <!-- Add the settings button here -->
+    <div class="settings-button" id="settings-button">
+      <img src="settings-button.png" alt="Settings">
+    </div>
+
+    <h1>Tic Tac Toe</h1>
+    <div class="scoreboard">
+      <div class="player1">
+        <h1>O</h1> 
+        <p id="name1"></p>
+      </div>
+      <div class="score"><span id="o-score">0</span> : <span id="x-score">0</span></div>
+      <div class="player2">
+        <h1>X</h1>
+        <p id="name2"></p>
+      </div>
+    </div>
+    <div class="board" id="board"></div>
+  </div>
+
+  <div id="pause-overlay">
+    <div id="pause-menu">
+      <!-- Close (Cross) Button -->
+      <img id="close-button"src="cross-button.png" alt="Close" />
+      <h2>PAUSE</h2>
+      <div id="sound-button" class="pause-button">
+        <img id="sound-image" src="speakeron-button.png" alt="Sound">
+      </div>
+      <div id="home-button" class="pause-button">
+        <img src="home-button.png" alt="Home">
+      </div>
+      <div id="reset-button" class="pause-button" onclick="resetGame()">
+        <img src="reset-button.png" alt="Reset">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const homepage = document.getElementById("homepage");
+    const playerdetail = document.getElementById("playerdetail");
+    const gamepage = document.getElementById("gamepage");
+    const pvpButton = document.getElementById('pvpButton');
+    const startGameButton = document.getElementById('startGame');
+    const player1NameInput = document.getElementById('player1Name');
+    const player2NameInput = document.getElementById('player2Name');
+    const Name1 = document.getElementById('name1');
+    const Name2 = document.getElementById('name2');
+    const board = document.getElementById("board");
+    const xScoreElement = document.getElementById("x-score");
+    const oScoreElement = document.getElementById("o-score");
+    const resetButton = document.getElementById("reset-button");
+    const settingsButton = document.getElementById('settings-button');
+    const pauseOverlay = document.getElementById('pause-overlay');
+    const closeButton = document.getElementById('close-button');
+    const homeButton = document.getElementById('home-button');
+    const soundButton = document.getElementById('sound-button');
+    const image = document.getElementById('sound-image');
+    const image1 = "speakeron-button.png"; // Path to the first image
+    const image2 = "speakeroff-button.png"; // Path to the second image
+    const homeimage = document.getElementById('homesound-image');
+    const homeimage1 = "speakeron-button.png"; // Path to the first image
+    const homeimage2 = "speakeroff-button.png"; // Path to the second image
+
+    let currentPlayer = "X";
+    let startingPlayer = "X"; // Keeps track of who starts the game
+    let xScore = 0;
+    let oScore = 0;
+    let boardState = Array(9).fill(null);
+
+    const winningCombinations = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    // Updated script
+    document.addEventListener("DOMContentLoaded", () => {
+      const splash = document.getElementById("splash");
+      const homepage = document.getElementById("homepage");
+      const loadingText = document.getElementById("loading-text");
+      const dots = document.getElementById("dots");
+      const gamepage = document.getElementById("gamepage"); // Ensure gamepage starts hidden
+      const body = document.body; // Reference to the body element
+
+      // Initially disable interactions
+      body.classList.add("no-interaction");
+
+      // Animate the dots in the loading text
+      let dotCount = 0;
+      const maxDots = 3;
+      setInterval(() => {
+        dotCount = (dotCount + 1) % (maxDots + 1);
+        dots.textContent = ".".repeat(dotCount);
+      }, 500); // Adjust speed with this value (milliseconds)
+
+      // Hide the splash screen after 10 seconds and show the homepage
+      setTimeout(() => {
+        splash.style.display = "none";
+        homepage.style.display = "block";
+        // Enable interactions after splash fades out
+        body.classList.remove("no-interaction");
+      }, 10000); // 10 seconds
+    });
+
+    // Display player detail on click
+    pvpButton.addEventListener('click', () => {
+      playerdetail.style.display = 'flex';
+    });
+
+    // Ensure only the game page is shown when starting Player vs Player
+    function startPlayerVsPlayer() {
+      const homepage = document.getElementById("homepage");
+      const gamepage = document.getElementById("gamepage");
+      let player1Name = player1NameInput.value.trim(); // Get Player 1's name
+      let player2Name = player2NameInput.value.trim(); // Get Player 2's name
+
+      // Set default names if inputs are empty
+      if (!player1Name) {
+        player1Name = "Player 1";
+      }
+      if (!player2Name) {
+        player2Name = "Player 2";
+      }
+      
+      homepage.style.display = "none"; // Hide the homepage
+      playerdetail.style.display = 'none'; // Hide the Player detail page
+      gamepage.style.display = "block"; // Show the game page
+      Name1.textContent = ` ${player1Name} `;
+      Name2.textContent = ` ${player2Name} `;
+      initializeBoard(); // Start the game
+    }
+
+    function updateBoardBorderColor() {
+      board.setAttribute("data-player", currentPlayer); // Add this line
+      board.style.borderColor = currentPlayer === "X" ? "red" : "blue";
+    }
+
+    function navigateBack() {
+      const homepage = document.getElementById("homepage");
+      const gamepage = document.getElementById("gamepage");
+
+      // Show the homepage and hide the game page
+      homepage.style.display = "block";
+      gamepage.style.display = "none";
+    }
+
+    function initializeBoard() {
+      board.innerHTML = "";
+      boardState = Array(9).fill(null);
+      currentPlayer = startingPlayer; // Set the starting player
+      startingPlayer = startingPlayer === "X" ? "O" : "X"; // Alternate starting player
+      updateBoardBorderColor();
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.addEventListener("click", handleCellClick, { once: true });
+        board.appendChild(cell);
+      }
+    }
+
+    // Display pause menu on click
+    settingsButton.addEventListener('click', () => {
+      pauseOverlay.style.display = 'flex';
+    });
+
+    // Close the pause menu when the cross button is clicked
+    closeButton.addEventListener('click', () => {
+      pauseOverlay.style.display = 'none';
+    });
+
+    image.addEventListener('click', () => {
+      // Check the current image source and switch to the other image
+      if (image.src.includes(image1)) {
+        image.src = image2;
+      } else {
+        image.src = image1;
+      }
+    });
+
+    homeimage.addEventListener('click', () => {
+      // Check the current image source and switch to the other image
+      if (homeimage.src.includes(homeimage1)) {
+        homeimage.src = homeimage2;
+      } else {
+        homeimage.src = homeimage1;
+      }
+    });
+
+    homeButton.addEventListener('click', () => {
+      const homepage = document.getElementById("homepage");
+      const gamepage = document.getElementById("gamepage");
+
+      // Show the homepage and hide the game page
+      homepage.style.display = "block";
+      gamepage.style.display = "none";
+      pauseOverlay.style.display = 'none';
+    });
+
+    // Resume game function
+    function resetGame() {
+      pauseOverlay.style.display = 'none';
+    }
+
+    function handleCellClick(e) {
+      const cell = e.target;
+      const index = cell.dataset.index;
+
+      if (boardState[index]) return; // Prevent further actions if already occupied
+
+      boardState[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add("occupied"); // Mark the cell as occupied
+
+      if (checkWinner(currentPlayer)) {
+        updateScore(currentPlayer);
+        highlightWinner();
+        setTimeout(() => {
+          alert(`${currentPlayer} wins!`);
+          initializeBoard();
+        }, 500);
+        return;
+      }
+
+      if (boardState.every(cell => cell)) {
+        alert("It's a draw!");
+        initializeBoard();
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      updateBoardBorderColor();
+    }
+
+    function updateBoardBorderColor() {
+      // Remove any existing glow classes
+      board.classList.remove("x-turn", "o-turn");
+
+      // Add glow class based on the current player
+      if (currentPlayer === "X") {
+        board.classList.add("x-turn");
+      } else {
+        board.classList.add("o-turn");
+      }
+    }
+
+    function checkWinner(player) {
+      return winningCombinations.some(combination =>
+        combination.every(index => boardState[index] === player)
+      );
+    }
+
+    function updateScore(player) {
+      if (player === "X") {
+        xScore++;
+        xScoreElement.textContent = xScore;
+      } else {
+        oScore++;
+        oScoreElement.textContent = oScore;
+      }
+    }
+
+    function highlightWinner() {
+      winningCombinations.forEach(combination => {
+        if (combination.every(index => boardState[index] === currentPlayer)) {
+          combination.forEach(index => {
+            board.children[index].classList.add("winner");
+          });
+        }
+      });
+    }
+
+    resetButton.addEventListener("click", () => {
+      xScore = 0;
+      oScore = 0;
+      xScoreElement.textContent = xScore;
+      oScoreElement.textContent = oScore;
+
+      // Randomly select the starting player
+      const randomStartingPlayer = Math.random() < 0.5 ? "X" : "O";
+
+      initializeBoard(randomStartingPlayer); // Pass the randomly chosen player
+    });
+
+    function exitGame() {
+      alert("Thanks for playing! Goodbye!");
+      window.close();
+    }
+  </script>
+</body>
+</html>
