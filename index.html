@@ -43,26 +43,35 @@
     .buttons {
       display: flex;
       flex-direction: column;
-      gap: 20px;
     }
 
-    button {
+    .homepage-button {
+      margin: 10px 190px;
       padding: 15px 30px;
-      font-size: 1.2rem;
-      background-color: #444;
+      font-family: 'Times New Roman', Times, serif;
+      font-weight: bold;
+      font-size: 20px;
+      background: linear-gradient(45deg, #6a11cb, #2575fc); /* Gradient background */
       color: white;
-      border: none;
-      border-radius: 5px;
+      border: 3px solid;
+      border-radius: 15px;
+      border-color: lightcyan;
       cursor: pointer;
       transition: background-color 0.3s;
     }
 
-    button:hover {
-      background-color: #666;
+    .homepage-button:hover {
+      transform: scale(1.1); /* Slightly enlarges button on hover */
+      box-shadow: 0 6px 10px rgba(0, 0, 0); /* Adds a more prominent shadow */
     }
 
-    button:active {
+    .homepage-button:active {
       background-color: #888;
+    }
+
+    .homepage-button:focus {
+      outline: none; /* Removes default focus outline */
+      box-shadow: 0 0 10px rgba(98, 0, 238, 0.5); /* Adds a glowing effect */
     }
 
     /* Homesound button style */
@@ -93,7 +102,8 @@
     }
 
     .homesound-button:active {
-      transform: scale(0.9); /* Shrinks slightly on click */
+      transform: scale(0.95); /* Button "press" effect */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect reduces */
     }
 
     #playerdetail {
@@ -122,7 +132,7 @@
 
     #playername h2 {
       border-top: 5px;
-      color: #00f;
+      color: white;
       margin-bottom: 20px;
       font-family: 'Times New Roman', Times, serif;
       font-size: 24px;
@@ -132,7 +142,7 @@
       padding: 10px 20px;
       border: none;
       border-radius: 25px; /* Rounded button */
-      background: linear-gradient(45deg, #6a11cb, #2575fc); /* Gradient background */
+      background: linear-gradient(45deg, #6a11cb, #2575fc, rgba(0, 0, 0, 0.2)); /* Gradient background */
       color: white;
       font-family: 'Times New Roman', Times, serif;
       font-weight: bold;
@@ -157,13 +167,23 @@
       box-shadow: 0 0 10px rgba(98, 0, 238, 0.5); /* Adds a glowing effect */
     }
 
+    #homecross-button {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      cursor: pointer;
+      background-color: #ff0000; /* Red */
+      box-shadow: 0 0 10px #ff0000;
+      border-radius: 50%;
+    }
+
     .hidden {
       display: none;
     }
 
     .game-image {
-      width: 50%; /* Makes the image full width of the container */
-      height: 50%; /* Keeps the aspect ratio */
+      width: 40%; /* Makes the image full width of the container */
+      height: 40%; /* Keeps the aspect ratio */
       margin: 20px 0; /* Adds space around the image */
       max-width: 600px; /* Optional: Limit the image width */
       display: block; /* Ensures the image is displayed as a block element */
@@ -560,16 +580,18 @@
     </div>
 
     <h1>Tic Tac Toe</h1>
+    <h1>3 X 3</h1>
     <img src="Tic-Tac-Toe-Logo.png" alt="Game Image" class="game-image">
     <div class="buttons">
-      <button id="pvpButton">Player vs Player</button>
-      <button onclick="alert('Player vs AI coming soon!')">Player vs AI</button>
-      <button onclick="exitGame()">Exit Game</button>
+      <button class="homepage-button" id="pvpButton">Player vs Player</button>
+      <button class="homepage-button" onclick="alert('Player vs AI coming soon!')">Player vs AI</button>
+      <button class="homepage-button" onclick="exitGame()">Exit Game</button>
     </div>
   </div>
 
   <div id="playerdetail">
     <div id="playername">
+      <img id="homecross-button" src="cross-button.png" alt="Close" />
       <h2>Enter Player Name</h2>
       <input type="text" id="player1Name" placeholder="Player 1">
       <br><br>
@@ -608,7 +630,7 @@
   <div id="pause-overlay">
     <div id="pause-menu">
       <!-- Close (Cross) Button -->
-      <img id="close-button"src="cross-button.png" alt="Close" />
+      <img id="close-button" src="cross-button.png" alt="Close" />
       <h2>PAUSE</h2>
       <div id="sound-button" class="pause-button">
         <img id="sound-image" src="speakeron-button.png" alt="Sound">
@@ -630,6 +652,7 @@
     const startGameButton = document.getElementById('startGame');
     const player1NameInput = document.getElementById('player1Name');
     const player2NameInput = document.getElementById('player2Name');
+    const homecrossButton = document.getElementById('homecross-button');
     const Name1 = document.getElementById('name1');
     const Name2 = document.getElementById('name2');
     const board = document.getElementById("board");
@@ -721,6 +744,10 @@
       Name2.textContent = ` ${player2Name} `;
       initializeBoard(); // Start the game
     }
+
+    homecrossButton.addEventListener('click', () => {
+      playerdetail.style.display = 'none';
+    });
 
     function updateBoardBorderColor() {
       board.setAttribute("data-player", currentPlayer); // Add this line
